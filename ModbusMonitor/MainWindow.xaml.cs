@@ -50,7 +50,7 @@ namespace ModbusMonitor
             var version = System.Reflection.Assembly.GetExecutingAssembly().GetName().Version;
             if (version != null)
             {
-                Title = $"Modbus Reader Poll By Ismail Lowkey v{version.Major}.{version.Minor}.{version.Build}";
+                Title = $"Modbus Monitor v{version.Major}.{version.Minor}.{version.Build}";
             }
 
             // Populate 10 default rows for all tabs
@@ -636,6 +636,21 @@ namespace ModbusMonitor
                 foreach (var item in _allInputRegisters) item.UpdateDisplayAddress();
                 foreach (var item in _allHoldingRegisters) item.UpdateDisplayAddress();
             }
+        }
+
+        private void MenuExit_Click(object sender, RoutedEventArgs e)
+        {
+            Application.Current.Shutdown();
+        }
+
+        private void MenuSourceCode_Click(object sender, RoutedEventArgs e)
+        {
+            System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo("https://github.com/ismaillowkey/ModbusMonitor") { UseShellExecute = true });
+        }
+
+        private void MenuAbout_Click(object sender, RoutedEventArgs e)
+        {
+            MessageBox.Show("Modbus Monitor v0.5.0\n\nA modern WPF Modbus TCP and Serial Client developed by Ismail Lowkey.\n\nThis application allows monitoring and writing to Modbus devices using TCP, RTU over TCP, and Serial (RTU/ASCII) protocols.", "About Modbus Monitor", MessageBoxButton.OK, MessageBoxImage.Information);
         }
     }
 }

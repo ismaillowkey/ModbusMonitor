@@ -1,5 +1,5 @@
 !define APPNAME "Modbus Monitor"
-!define APPVERSION "0.1.1"
+!define APPVERSION "0.5.0"
 !define COMPANYNAME "Ismail Lowkey"
 !define DESCRIPTION "A Modern WPF Modbus TCP Client"
 
@@ -34,6 +34,23 @@ RequestExecutionLevel admin
 
 ; Languages
 !insertmacro MUI_LANGUAGE "English"
+
+Function .onInit
+  ; Check for the very first old version (named differently) and uninstall it
+  ReadRegStr $R0 HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\Modbus Reader Poll By Ismail Lowkey" "QuietUninstallString"
+  StrCmp $R0 "" check_new
+  ClearErrors
+  ExecWait '$R0 _?=$PROGRAMFILES64\Modbus Reader Poll By Ismail Lowkey'
+
+check_new:
+  ReadRegStr $R0 HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\${APPNAME}" "QuietUninstallString"
+  StrCmp $R0 "" done
+  
+  ; Run the uninstaller silently and wait for it to finish
+  ClearErrors
+  ExecWait '$R0 _?=$INSTDIR'
+done:
+FunctionEnd
 
 ; Default section (Installation)
 Section "Install"
