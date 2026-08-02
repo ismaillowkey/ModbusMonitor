@@ -1,5 +1,5 @@
 !define APPNAME "Modbus Monitor"
-!define APPVERSION "0.6.1"
+!define APPVERSION "0.7.0"
 !define COMPANYNAME "Ismail Lowkey"
 !define DESCRIPTION "A Modern WPF Modbus TCP Client"
 

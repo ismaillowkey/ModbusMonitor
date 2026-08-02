@@ -6,6 +6,7 @@ namespace ModbusMonitor.Models
     public class ModbusRegisterItem : INotifyPropertyChanged
     {
         private string _type = string.Empty;
+        private string _name = "Label";
         private byte _slaveId = 1;
         private int _address;
         private string _dataType = "UInt16 (16-bit)";
@@ -13,6 +14,12 @@ namespace ModbusMonitor.Models
         private int _length = 1;
         private string _value = "0";
         private string _errorMessage = string.Empty;
+
+        public string Name
+        {
+            get => _name;
+            set { _name = value; OnPropertyChanged(); }
+        }
 
         public bool BooleanValue
         {
@@ -35,6 +42,13 @@ namespace ModbusMonitor.Models
                 OnPropertyChanged(); 
                 OnPropertyChanged(nameof(HasError)); 
             }
+        }
+
+        private string _messageColor = "#DC3545"; // Default red for error
+        public string MessageColor
+        {
+            get => _messageColor;
+            set { _messageColor = value; OnPropertyChanged(); }
         }
 
         public bool HasError => !string.IsNullOrEmpty(_errorMessage);

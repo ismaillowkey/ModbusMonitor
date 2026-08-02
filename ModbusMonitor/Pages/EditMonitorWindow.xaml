@@ -66,17 +66,33 @@
 
             <!-- Content -->
             <StackPanel Grid.Row="1" Margin="20">
-                <TextBlock Text="Data Type" FontWeight="Bold" Margin="0,0,0,5"/>
-                <ComboBox x:Name="cmbDataType" Height="35" Margin="0,0,0,15" Padding="10,0" VerticalContentAlignment="Center" SelectionChanged="CmbDataType_SelectionChanged">
-                    <ComboBoxItem Content="Int16 (16-bit)"/>
-                    <ComboBoxItem Content="UInt16 (16-bit)"/>
-                    <ComboBoxItem Content="Int32 (32-bit)"/>
-                    <ComboBoxItem Content="UInt32 (32-bit)"/>
-                    <ComboBoxItem Content="Float32 (32-bit)"/>
-                    <ComboBoxItem Content="Int64 (64-bit)"/>
-                    <ComboBoxItem Content="UInt64 (64-bit)"/>
-                    <ComboBoxItem Content="Double (64-bit)"/>
-                </ComboBox>
+                <Grid Margin="0,0,0,15">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="2*"/>
+                    </Grid.ColumnDefinitions>
+                    
+                    <StackPanel Grid.Column="0" Margin="0,0,10,0">
+                        <TextBlock Text="Address" FontWeight="Bold" Margin="0,0,0,5"/>
+                        <TextBox x:Name="txtAddress" Height="35" Padding="10,0" VerticalContentAlignment="Center"/>
+                    </StackPanel>
+                    
+                    <StackPanel Grid.Column="1" Margin="10,0,0,0">
+                        <TextBlock Text="Data Type" FontWeight="Bold" Margin="0,0,0,5"/>
+                        <ComboBox x:Name="cmbDataType" Height="35" Padding="10,0" VerticalContentAlignment="Center" SelectionChanged="CmbDataType_SelectionChanged">
+                            <ComboBoxItem Content="Int16 (16-bit)"/>
+                            <ComboBoxItem Content="UInt16 (16-bit)"/>
+                            <ComboBoxItem Content="Int32 (32-bit)"/>
+                            <ComboBoxItem Content="UInt32 (32-bit)"/>
+                            <ComboBoxItem Content="Float32 (32-bit)"/>
+                            <ComboBoxItem Content="Int64 (64-bit)"/>
+                            <ComboBoxItem Content="UInt64 (64-bit)"/>
+                            <ComboBoxItem Content="Double (64-bit)"/>
+                            <ComboBoxItem Content="String (1 char/word)"/>
+                            <ComboBoxItem Content="String (2 chars/word)"/>
+                        </ComboBox>
+                    </StackPanel>
+                </Grid>
 
                 <Grid>
                     <Grid.ColumnDefinitions>
@@ -95,7 +111,7 @@
                     </StackPanel>
                     
                     <StackPanel Grid.Column="1" Margin="10,0,0,0">
-                        <TextBlock Text="Length (Words)" FontWeight="Bold" Margin="0,0,0,5"/>
+                        <TextBlock x:Name="lblLength" Text="Length (Words)" FontWeight="Bold" Margin="0,0,0,5"/>
                         <TextBox x:Name="txtLength" Height="35" IsReadOnly="True" Background="#E9ECEF" Foreground="#495057" Padding="10,0" VerticalContentAlignment="Center"/>
                     </StackPanel>
                 </Grid>

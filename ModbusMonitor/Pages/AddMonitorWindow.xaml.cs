@@ -11,7 +11,7 @@ namespace ModbusMonitor
         public string SelectedDataType { get; private set; } = "UInt16 (16-bit)";
         public string SelectedEndianness { get; private set; } = "ABCD (Big Endian)";
         public int RegisterLength { get; private set; } = 1;
-        public int BulkAddCount { get; private set; } = 10;
+        public int BulkAddCount { get; private set; } = 1;
 
         public AddMonitorWindow(string defaultRegisterType, int defaultAddress)
         {
@@ -43,11 +43,20 @@ namespace ModbusMonitor
                     cmbDataType.IsEnabled = false;
                     cmbEndianness.IsEnabled = false;
                     txtLength.Text = "1";
+                    txtLength.IsReadOnly = true;
+                    txtLength.Background = (System.Windows.Media.Brush)new System.Windows.Media.BrushConverter().ConvertFrom("#E9ECEF");
+                    
+                    if (pnlDataType != null) pnlDataType.Visibility = System.Windows.Visibility.Collapsed;
+                    if (gridOptions != null) gridOptions.Visibility = System.Windows.Visibility.Collapsed;
                 }
                 else
                 {
                     cmbDataType.IsEnabled = true;
                     cmbEndianness.IsEnabled = true;
+                    
+                    if (pnlDataType != null) pnlDataType.Visibility = System.Windows.Visibility.Visible;
+                    if (gridOptions != null) gridOptions.Visibility = System.Windows.Visibility.Visible;
+                    
                     UpdateLength();
                 }
             }
@@ -60,16 +69,47 @@ namespace ModbusMonitor
 
         private void UpdateLength()
         {
-            if (cmbDataType?.SelectedItem is ComboBoxItem item && txtLength != null)
+            if (cmbDataType?.SelectedItem is ComboBoxItem item && txtLength != null && cmbEndianness != null && lblLength != null)
             {
                 string dt = item.Content.ToString() ?? "";
-                if (dt.Contains("32-bit"))
+                
+                if (dt.Contains("String"))
                 {
-                    txtLength.Text = "2";
+                    lblLength.Text = "Length of String";
+                    txtLength.IsReadOnly = false;
+                    txtLength.Background = System.Windows.Media.Brushes.White;
+                    bool isTwoChars = dt.Contains("2 chars");
+                    int expectedCount = isTwoChars ? 2 : 1;
+
+                    if (cmbEndianness.Items.Count != expectedCount || !((ComboBoxItem)cmbEndianness.Items[0]).Content.ToString().Contains("String"))
+                    {
+                        cmbEndianness.Items.Clear();
+                        cmbEndianness.Items.Add(new ComboBoxItem { Content = "String Normal" });
+                        if (isTwoChars)
+                        {
+                            cmbEndianness.Items.Add(new ComboBoxItem { Content = "String Reverse" });
+                        }
+                        cmbEndianness.SelectedIndex = 0;
+                    }
                 }
                 else
                 {
-                    txtLength.Text = "1";
+                    lblLength.Text = "Length (Words)";
+                    txtLength.IsReadOnly = true;
+                    txtLength.Background = (System.Windows.Media.Brush)new System.Windows.Media.BrushConverter().ConvertFrom("#E9ECEF");
+                    if (cmbEndianness.Items.Count < 4 || !((ComboBoxItem)cmbEndianness.Items[0]).Content.ToString().Contains("ABCD"))
+                    {
+                        cmbEndianness.Items.Clear();
+                        cmbEndianness.Items.Add(new ComboBoxItem { Content = "ABCD (Big Endian)" });
+                        cmbEndianness.Items.Add(new ComboBoxItem { Content = "DCBA (Little Endian)" });
+                        cmbEndianness.Items.Add(new ComboBoxItem { Content = "BADC (Byte Swap)" });
+                        cmbEndianness.Items.Add(new ComboBoxItem { Content = "CDAB (Word Swap)" });
+                        cmbEndianness.SelectedIndex = 0;
+                    }
+
+                    if (dt.Contains("64-bit")) txtLength.Text = "4";
+                    else if (dt.Contains("32-bit")) txtLength.Text = "2";
+                    else txtLength.Text = "1";
                 }
             }
         }

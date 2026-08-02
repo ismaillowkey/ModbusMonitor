@@ -40,6 +40,7 @@ namespace ModbusMonitor
         private DispatcherTimer _pollTimer;
         private bool _shouldBeConnected = false;
         private bool _isReconnecting = false;
+        private bool _isPolling = false;
         private ConnectionConfig _currentConfig = new ConnectionConfig();
 
         public MainWindow()
@@ -52,15 +53,6 @@ namespace ModbusMonitor
             if (version != null)
             {
                 Title = $"Modbus Monitor v{version.Major}.{version.Minor}.{version.Build}";
-            }
-
-            // Populate 10 default rows for all tabs
-            for (int i = 0; i < 10; i++)
-            {
-                _allCoils.Add(new ModbusRegisterItem { Type = "COIL", Address = i });
-                _allDiscreteInputs.Add(new ModbusRegisterItem { Type = "DISCRETE INPUT", Address = i });
-                _allInputRegisters.Add(new ModbusRegisterItem { Type = "INPUT REGISTER", Address = i });
-                _allHoldingRegisters.Add(new ModbusRegisterItem { Type = "HOLDING REGISTER", Address = i });
             }
 
             UpdatePagination();
@@ -134,7 +126,7 @@ namespace ModbusMonitor
             }
             else
             {
-                _serialPort = new SerialPort(_currentConfig.ComPort, _currentConfig.BaudRate, _currentConfig.Parity, 8, _currentConfig.StopBits);
+                _serialPort = new SerialPort(_currentConfig.ComPort, _currentConfig.BaudRate, _currentConfig.Parity, _currentConfig.DataBits, _currentConfig.StopBits);
                 _serialPort.ReadTimeout = _currentConfig.Timeout;
                 _serialPort.WriteTimeout = _currentConfig.Timeout;
                 _serialPort.Open();
@@ -223,18 +215,18 @@ namespace ModbusMonitor
 
         private async void PollTimer_Tick(object? sender, EventArgs e)
         {
-            if (_isReconnecting || !_shouldBeConnected) return;
+            if (_isReconnecting || !_shouldBeConnected || _isPolling) return;
 
-            bool isTcp = _currentConfig.Protocol == ModbusProtocol.Tcp || _currentConfig.Protocol == ModbusProtocol.RtuOverTcp;
-            var master = _modbusMaster;
-            if (master == null || (isTcp && (_tcpClient == null || !_tcpClient.Connected)) || (!isTcp && (_serialPort == null || !_serialPort.IsOpen)))
-            {
-                _ = ReconnectAsync();
-                return;
-            }
-
+            _isPolling = true;
             try
             {
+                bool isTcp = _currentConfig.Protocol == ModbusProtocol.Tcp || _currentConfig.Protocol == ModbusProtocol.RtuOverTcp;
+                var master = _modbusMaster;
+                if (master == null || (isTcp && (_tcpClient == null || !_tcpClient.Connected)) || (!isTcp && (_serialPort == null || !_serialPort.IsOpen)))
+                {
+                    _ = ReconnectAsync();
+                    return;
+                }
                 // Poll Coils
                 foreach (var item in Coils.ToList())
                 {
@@ -243,12 +235,13 @@ namespace ModbusMonitor
                         if (master == null) break;
                         bool[] coils = await master.ReadCoilsAsync(item.SlaveId, (ushort)item.Address, 1);
                         if (!item.IsEditing) item.Value = coils[0] ? "1" : "0";
-                        item.ErrorMessage = string.Empty;
+                        if (item.ErrorMessage != "sended") item.ErrorMessage = string.Empty;
                     }
                     catch (Exception ex) 
                     { 
-                        if (ex is System.IO.IOException || ex is InvalidOperationException || ex is NullReferenceException || ex.InnerException is System.Net.Sockets.SocketException) throw;
+                        if (isTcp && (ex is System.IO.IOException || ex is InvalidOperationException || ex is NullReferenceException || ex.InnerException is System.Net.Sockets.SocketException)) throw;
                         item.ErrorMessage = ex.Message; 
+                        item.MessageColor = "#DC3545"; // Red
                     }
                 }
 
@@ -260,12 +253,13 @@ namespace ModbusMonitor
                         if (master == null) break;
                         bool[] inputs = await master.ReadInputsAsync(item.SlaveId, (ushort)item.Address, 1);
                         item.Value = inputs[0] ? "1" : "0";
-                        item.ErrorMessage = string.Empty;
+                        if (item.ErrorMessage != "sended") item.ErrorMessage = string.Empty;
                     }
                     catch (Exception ex) 
                     { 
-                        if (ex is System.IO.IOException || ex is InvalidOperationException || ex is NullReferenceException || ex.InnerException is System.Net.Sockets.SocketException) throw;
+                        if (isTcp && (ex is System.IO.IOException || ex is InvalidOperationException || ex is NullReferenceException || ex.InnerException is System.Net.Sockets.SocketException)) throw;
                         item.ErrorMessage = ex.Message; 
+                        item.MessageColor = "#DC3545"; // Red
                     }
                 }
 
@@ -277,12 +271,13 @@ namespace ModbusMonitor
                         if (master == null) break;
                         ushort[] registers = await master.ReadInputRegistersAsync(item.SlaveId, (ushort)item.Address, (ushort)item.Length);
                         item.Value = ModbusDataConverter.ConvertRegistersToString(registers, item.DataType, item.Endian);
-                        item.ErrorMessage = string.Empty;
+                        if (item.ErrorMessage != "sended") item.ErrorMessage = string.Empty;
                     }
                     catch (Exception ex) 
                     { 
-                        if (ex is System.IO.IOException || ex is InvalidOperationException || ex is NullReferenceException || ex.InnerException is System.Net.Sockets.SocketException) throw;
+                        if (isTcp && (ex is System.IO.IOException || ex is InvalidOperationException || ex is NullReferenceException || ex.InnerException is System.Net.Sockets.SocketException)) throw;
                         item.ErrorMessage = ex.Message; 
+                        item.MessageColor = "#DC3545"; // Red
                     }
                 }
 
@@ -294,12 +289,13 @@ namespace ModbusMonitor
                         if (master == null) break;
                         ushort[] registers = await master.ReadHoldingRegistersAsync(item.SlaveId, (ushort)item.Address, (ushort)item.Length);
                         if (!item.IsEditing) item.Value = ModbusDataConverter.ConvertRegistersToString(registers, item.DataType, item.Endian);
-                        item.ErrorMessage = string.Empty;
+                        if (item.ErrorMessage != "sended") item.ErrorMessage = string.Empty;
                     }
                     catch (Exception ex) 
                     { 
-                        if (ex is System.IO.IOException || ex is InvalidOperationException || ex is NullReferenceException || ex.InnerException is System.Net.Sockets.SocketException) throw;
+                        if (isTcp && (ex is System.IO.IOException || ex is InvalidOperationException || ex is NullReferenceException || ex.InnerException is System.Net.Sockets.SocketException)) throw;
                         item.ErrorMessage = ex.Message; 
+                        item.MessageColor = "#DC3545"; // Red
                     }
                 }
             }
@@ -314,6 +310,10 @@ namespace ModbusMonitor
                     }
                     _ = ReconnectAsync();
                 }
+            }
+            finally
+            {
+                _isPolling = false;
             }
         }
 
@@ -331,12 +331,15 @@ namespace ModbusMonitor
                 {
                     try
                     {
+                        item.ErrorMessage = "sending...";
+                        item.MessageColor = "#FFC107"; // Yellow
+
                         if (item.Type == "HOLDING REGISTER")
                         {
                             try
                             {
-                                ushort[] registers = ModbusDataConverter.ConvertStringToRegisters(textBox.Text, item.DataType, item.Endian);
-                                if (registers.Length == 1)
+                                ushort[] registers = ModbusDataConverter.ConvertStringToRegisters(textBox.Text, item.DataType, item.Endian, item.Length);
+                                if (registers.Length == 1 && item.Length <= 1)
                                 {
                                     await _modbusMaster.WriteSingleRegisterAsync(item.SlaveId, (ushort)item.Address, registers[0]);
                                 }
@@ -344,19 +347,24 @@ namespace ModbusMonitor
                                 {
                                     await _modbusMaster.WriteMultipleRegistersAsync(item.SlaveId, (ushort)item.Address, registers);
                                 }
-                                MessageBox.Show("Value written successfully.", "Success", MessageBoxButton.OK, MessageBoxImage.Information);
+                                
+                                item.ErrorMessage = "sended";
+                                item.MessageColor = "#198754"; // Green
                                 item.IsEditing = false; // Turn off editing state on enter
                             }
                             catch (ArgumentException)
                             {
-                                MessageBox.Show($"Invalid value for {item.DataType}.", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                                item.ErrorMessage = $"Invalid value for {item.DataType}.";
+                                item.MessageColor = "#DC3545"; // Red
                             }
                         }
                         else if (item.Type == "COIL")
                         {
                             bool val = textBox.Text == "1" || textBox.Text.ToLower() == "true";
                             await _modbusMaster.WriteSingleCoilAsync(item.SlaveId, (ushort)item.Address, val);
-                            MessageBox.Show("Coil written successfully.", "Success", MessageBoxButton.OK, MessageBoxImage.Information);
+                            
+                            item.ErrorMessage = "sended";
+                            item.MessageColor = "#198754"; // Green
                             item.IsEditing = false; // Turn off editing state on enter
                         }
                         // Remove focus from the textbox to visually indicate save completion
@@ -364,7 +372,8 @@ namespace ModbusMonitor
                     }
                     catch (Exception ex)
                     {
-                        MessageBox.Show($"Write failed: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                        item.ErrorMessage = $"Write failed: {ex.Message}";
+                        item.MessageColor = "#DC3545"; // Red
                     }
                 }
             }
@@ -382,13 +391,20 @@ namespace ModbusMonitor
 
                 try
                 {
+                    item.ErrorMessage = "sending...";
+                    item.MessageColor = "#FFC107"; // Yellow
+
                     bool val = item.BooleanValue;
                     await _modbusMaster.WriteSingleCoilAsync(item.SlaveId, (ushort)item.Address, val);
+                    
+                    item.ErrorMessage = "sended";
+                    item.MessageColor = "#198754"; // Green
                     item.IsEditing = false;
                 }
                 catch (Exception ex)
                 {
-                    MessageBox.Show($"Write failed: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                    item.ErrorMessage = $"Write failed: {ex.Message}";
+                    item.MessageColor = "#DC3545"; // Red
                     item.BooleanValue = !item.BooleanValue; // Revert
                 }
             }
@@ -642,6 +658,18 @@ namespace ModbusMonitor
         private void MenuExit_Click(object sender, RoutedEventArgs e)
         {
             Application.Current.Shutdown();
+        }
+
+        private void ErrorMessage_Click(object sender, RoutedEventArgs e)
+        {
+            if (sender is Button btn && btn.DataContext is ModbusRegisterItem item)
+            {
+                if (!string.IsNullOrWhiteSpace(item.ErrorMessage))
+                {
+                    MessageBoxImage icon = item.MessageColor == "#DC3545" ? MessageBoxImage.Error : MessageBoxImage.Information;
+                    MessageBox.Show(item.ErrorMessage, "Message Details", MessageBoxButton.OK, icon);
+                }
+            }
         }
 
         private void MenuSourceCode_Click(object sender, RoutedEventArgs e)

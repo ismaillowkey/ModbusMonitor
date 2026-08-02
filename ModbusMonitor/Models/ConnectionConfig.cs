@@ -22,6 +22,7 @@ namespace ModbusMonitor.Models
         // Serial Settings
         public string ComPort { get; set; } = "COM1";
         public int BaudRate { get; set; } = 9600;
+        public int DataBits { get; set; } = 8;
         public Parity Parity { get; set; } = Parity.None;
         public StopBits StopBits { get; set; } = StopBits.One;
 

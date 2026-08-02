@@ -44,6 +44,7 @@ namespace ModbusMonitor
                 cmbComPort.SelectedItem = Config.ComPort;
             
             SelectComboBoxItem(cmbBaudRate, Config.BaudRate.ToString());
+            SelectComboBoxItem(cmbDataBits, Config.DataBits.ToString());
             SelectComboBoxItem(cmbParity, Config.Parity.ToString());
             
             string stopBitsStr = Config.StopBits == StopBits.OnePointFive ? "1.5" : Config.StopBits == StopBits.One ? "1" : Config.StopBits.ToString();
@@ -121,6 +122,7 @@ namespace ModbusMonitor
                 
                 Config.ComPort = cmbComPort.SelectedItem.ToString() ?? "COM1";
                 Config.BaudRate = int.Parse(((ComboBoxItem)cmbBaudRate.SelectedItem).Content.ToString() ?? "9600");
+                Config.DataBits = int.Parse(((ComboBoxItem)cmbDataBits.SelectedItem).Content.ToString() ?? "8");
                 Config.Parity = (Parity)Enum.Parse(typeof(Parity), ((ComboBoxItem)cmbParity.SelectedItem).Content.ToString() ?? "None");
                 
                 string stopBitsStr = ((ComboBoxItem)cmbStopBits.SelectedItem).Content.ToString() ?? "1";

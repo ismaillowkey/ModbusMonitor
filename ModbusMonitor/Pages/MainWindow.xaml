@@ -6,7 +6,7 @@
         xmlns:local="clr-namespace:ModbusMonitor"
         mc:Ignorable="d"
         Icon="/img/logo.png"
-        Title="Modbus Monitor" SizeToContent="Height" Width="1250" Background="#F8F9FA">
+        Title="Modbus Monitor" Height="680" Width="1250" MinHeight="600" MinWidth="1000" WindowState="Maximized" Background="#F8F9FA">
     <Window.Resources>
         <!-- Modern Button Style -->
         <Style TargetType="Button" x:Key="ModernButton">
@@ -46,7 +46,7 @@
         <Style TargetType="TextBox" x:Key="ModernTextBox">
             <Setter Property="Padding" Value="8,4"/>
             <Setter Property="VerticalContentAlignment" Value="Center"/>
-            <Setter Property="MinHeight" Value="32"/>
+            <Setter Property="MinHeight" Value="45"/>
             <Setter Property="BorderBrush" Value="#CED4DA"/>
             <Setter Property="BorderThickness" Value="1"/>
             <Setter Property="Background" Value="White"/>
@@ -65,7 +65,7 @@
             <Setter Property="Background" Value="White"/>
             <Setter Property="BorderBrush" Value="#DEE2E6"/>
             <Setter Property="BorderThickness" Value="1"/>
-            <Setter Property="RowHeight" Value="45"/>
+            <Setter Property="RowHeight" Value="60"/>
             <Setter Property="AlternatingRowBackground" Value="#F8F9FA"/>
             <Setter Property="HeadersVisibility" Value="Column"/>
             <Setter Property="GridLinesVisibility" Value="Horizontal"/>
@@ -170,10 +170,11 @@
                 <TabItem Header="Coils (0x)">
                     <DataGrid x:Name="dgCoils" AutoGenerateColumns="False" CanUserAddRows="False" ItemsSource="{Binding Coils}">
                         <DataGrid.Columns>
+                            <DataGridTextColumn Header="Name/Label" Binding="{Binding Name, UpdateSourceTrigger=PropertyChanged}" Width="150"/>
                             <DataGridTextColumn Header="Slave ID" Binding="{Binding SlaveId, UpdateSourceTrigger=PropertyChanged}" Width="Auto"/>
                             <DataGridTextColumn Header="Type" Binding="{Binding Type}" IsReadOnly="True" Width="Auto"/>
                             <DataGridTextColumn Header="Address" Binding="{Binding DisplayAddress, UpdateSourceTrigger=PropertyChanged}" IsReadOnly="True" Width="Auto"/>
-                            <DataGridTemplateColumn Header="Value (Click to Toggle)" Width="150">
+                            <DataGridTemplateColumn Header="Value (Click to Toggle)" Width="250">
                                 <DataGridTemplateColumn.CellTemplate>
                                     <DataTemplate>
                                         <ToggleButton IsChecked="{Binding BooleanValue, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Click="Coil_Toggle_Click" Width="80" Height="30" Cursor="Hand">
@@ -204,10 +205,12 @@
                                     </DataTemplate>
                                 </DataGridTemplateColumn.CellTemplate>
                             </DataGridTemplateColumn>
-                            <DataGridTemplateColumn Header="Error" Width="*">
+                            <DataGridTemplateColumn Header="Error/Message" Width="*">
                                 <DataGridTemplateColumn.CellTemplate>
                                     <DataTemplate>
-                                        <TextBlock Text="{Binding ErrorMessage}" Foreground="#DC3545" VerticalAlignment="Center" Margin="5,0"/>
+                                        <Button Click="ErrorMessage_Click" Background="Transparent" BorderThickness="0" HorizontalContentAlignment="Left" Cursor="Hand">
+                                            <TextBlock Text="{Binding ErrorMessage}" Foreground="{Binding MessageColor}" VerticalAlignment="Center" Margin="5,0" TextTrimming="CharacterEllipsis" ToolTip="Click to view full message"/>
+                                        </Button>
                                     </DataTemplate>
                                 </DataGridTemplateColumn.CellTemplate>
                             </DataGridTemplateColumn>
@@ -228,20 +231,23 @@
                 <TabItem Header="Discrete Inputs (1x)">
                     <DataGrid x:Name="dgDiscreteInputs" AutoGenerateColumns="False" CanUserAddRows="False" ItemsSource="{Binding DiscreteInputs}">
                         <DataGrid.Columns>
+                            <DataGridTextColumn Header="Name/Label" Binding="{Binding Name, UpdateSourceTrigger=PropertyChanged}" Width="150"/>
                             <DataGridTextColumn Header="Slave ID" Binding="{Binding SlaveId, UpdateSourceTrigger=PropertyChanged}" Width="Auto"/>
                             <DataGridTextColumn Header="Type" Binding="{Binding Type}" IsReadOnly="True" Width="Auto"/>
                             <DataGridTextColumn Header="Address" Binding="{Binding DisplayAddress, UpdateSourceTrigger=PropertyChanged}" IsReadOnly="True" Width="Auto"/>
-                            <DataGridTemplateColumn Header="Value" Width="150">
+                            <DataGridTemplateColumn Header="Value" Width="250">
                                 <DataGridTemplateColumn.CellTemplate>
                                     <DataTemplate>
                                         <TextBox Text="{Binding Value, Mode=OneWay}" Style="{StaticResource ModernTextBox}" IsReadOnly="True" Background="#F8F9FA"/>
                                     </DataTemplate>
                                 </DataGridTemplateColumn.CellTemplate>
                             </DataGridTemplateColumn>
-                            <DataGridTemplateColumn Header="Error" Width="*">
+                            <DataGridTemplateColumn Header="Error/Message" Width="*">
                                 <DataGridTemplateColumn.CellTemplate>
                                     <DataTemplate>
-                                        <TextBlock Text="{Binding ErrorMessage}" Foreground="#DC3545" VerticalAlignment="Center" Margin="5,0"/>
+                                        <Button Click="ErrorMessage_Click" Background="Transparent" BorderThickness="0" HorizontalContentAlignment="Left" Cursor="Hand">
+                                            <TextBlock Text="{Binding ErrorMessage}" Foreground="{Binding MessageColor}" VerticalAlignment="Center" Margin="5,0" TextTrimming="CharacterEllipsis" ToolTip="Click to view full message"/>
+                                        </Button>
                                     </DataTemplate>
                                 </DataGridTemplateColumn.CellTemplate>
                             </DataGridTemplateColumn>
@@ -262,23 +268,26 @@
                 <TabItem Header="Input Registers (3x)">
                     <DataGrid x:Name="dgInputRegisters" AutoGenerateColumns="False" CanUserAddRows="False" ItemsSource="{Binding InputRegisters}">
                         <DataGrid.Columns>
+                            <DataGridTextColumn Header="Name/Label" Binding="{Binding Name, UpdateSourceTrigger=PropertyChanged}" Width="150"/>
                             <DataGridTextColumn Header="Slave ID" Binding="{Binding SlaveId, UpdateSourceTrigger=PropertyChanged}" Width="Auto"/>
                             <DataGridTextColumn Header="Type" Binding="{Binding Type}" IsReadOnly="True" Width="Auto"/>
                             <DataGridTextColumn Header="Address" Binding="{Binding DisplayAddress, UpdateSourceTrigger=PropertyChanged}" IsReadOnly="True" Width="Auto"/>
                             <DataGridTextColumn Header="Data Type" Binding="{Binding DataType}" IsReadOnly="True" Width="Auto"/>
                             <DataGridTextColumn Header="Endian" Binding="{Binding Endian}" IsReadOnly="True" Width="Auto"/>
                             <DataGridTextColumn Header="Length" Binding="{Binding Length}" IsReadOnly="True" Width="Auto"/>
-                            <DataGridTemplateColumn Header="Value" Width="150">
+                            <DataGridTemplateColumn Header="Value" Width="350">
                                 <DataGridTemplateColumn.CellTemplate>
                                     <DataTemplate>
                                         <TextBox Text="{Binding Value, Mode=OneWay}" Style="{StaticResource ModernTextBox}" IsReadOnly="True" Background="#F8F9FA"/>
                                     </DataTemplate>
                                 </DataGridTemplateColumn.CellTemplate>
                             </DataGridTemplateColumn>
-                            <DataGridTemplateColumn Header="Error" Width="*">
+                            <DataGridTemplateColumn Header="Error/Message" Width="*">
                                 <DataGridTemplateColumn.CellTemplate>
                                     <DataTemplate>
-                                        <TextBlock Text="{Binding ErrorMessage}" Foreground="#DC3545" VerticalAlignment="Center" Margin="5,0"/>
+                                        <Button Click="ErrorMessage_Click" Background="Transparent" BorderThickness="0" HorizontalContentAlignment="Left" Cursor="Hand">
+                                            <TextBlock Text="{Binding ErrorMessage}" Foreground="{Binding MessageColor}" VerticalAlignment="Center" Margin="5,0" TextTrimming="CharacterEllipsis" ToolTip="Click to view full message"/>
+                                        </Button>
                                     </DataTemplate>
                                 </DataGridTemplateColumn.CellTemplate>
                             </DataGridTemplateColumn>
@@ -300,23 +309,26 @@
                 <TabItem Header="Holding Registers (4x)" IsSelected="True">
                     <DataGrid x:Name="dgHoldingRegisters" AutoGenerateColumns="False" CanUserAddRows="False" ItemsSource="{Binding HoldingRegisters}">
                         <DataGrid.Columns>
+                            <DataGridTextColumn Header="Name/Label" Binding="{Binding Name, UpdateSourceTrigger=PropertyChanged}" Width="150"/>
                             <DataGridTextColumn Header="Slave ID" Binding="{Binding SlaveId, UpdateSourceTrigger=PropertyChanged}" Width="Auto"/>
                             <DataGridTextColumn Header="Type" Binding="{Binding Type}" IsReadOnly="True" Width="Auto"/>
                             <DataGridTextColumn Header="Address" Binding="{Binding DisplayAddress, UpdateSourceTrigger=PropertyChanged}" IsReadOnly="True" Width="Auto"/>
                             <DataGridTextColumn Header="Data Type" Binding="{Binding DataType}" IsReadOnly="True" Width="Auto"/>
                             <DataGridTextColumn Header="Endian" Binding="{Binding Endian}" IsReadOnly="True" Width="Auto"/>
                             <DataGridTextColumn Header="Length" Binding="{Binding Length}" IsReadOnly="True" Width="Auto"/>
-                            <DataGridTemplateColumn Header="Value (Enter to Save)" Width="150">
+                            <DataGridTemplateColumn Header="Value (Enter to Save)" Width="350">
                                 <DataGridTemplateColumn.CellTemplate>
                                     <DataTemplate>
                                         <TextBox Text="{Binding Value, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource ModernTextBox}" KeyDown="TxtValue_KeyDown" GotFocus="TxtValue_GotFocus" LostFocus="TxtValue_LostFocus"/>
                                     </DataTemplate>
                                 </DataGridTemplateColumn.CellTemplate>
                             </DataGridTemplateColumn>
-                            <DataGridTemplateColumn Header="Error" Width="*">
+                            <DataGridTemplateColumn Header="Error/Message" Width="*">
                                 <DataGridTemplateColumn.CellTemplate>
                                     <DataTemplate>
-                                        <TextBlock Text="{Binding ErrorMessage}" Foreground="#DC3545" VerticalAlignment="Center" Margin="5,0"/>
+                                        <Button Click="ErrorMessage_Click" Background="Transparent" BorderThickness="0" HorizontalContentAlignment="Left" Cursor="Hand">
+                                            <TextBlock Text="{Binding ErrorMessage}" Foreground="{Binding MessageColor}" VerticalAlignment="Center" Margin="5,0" TextTrimming="CharacterEllipsis" ToolTip="Click to view full message"/>
+                                        </Button>
                                     </DataTemplate>
                                 </DataGridTemplateColumn.CellTemplate>
                             </DataGridTemplateColumn>
@@ -335,14 +347,14 @@
                 </TabItem>
             </TabControl>
 
-            <StackPanel Grid.Row="0" Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Top" Margin="0,10,15,0">
-                <ComboBox x:Name="cmbAddressBase" Width="200" SelectedIndex="0" Padding="5,2" Margin="0,0,15,0" SelectionChanged="CmbAddressBase_SelectionChanged">
+            <StackPanel Grid.Row="0" Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Top" Margin="0,5,15,0">
+                <ComboBox x:Name="cmbAddressBase" Width="200" Height="30" MinHeight="0" SelectedIndex="0" Padding="5,2" Margin="0,0,15,0" SelectionChanged="CmbAddressBase_SelectionChanged">
                     <ComboBoxItem Content="address modbus start from 0"/>
                     <ComboBoxItem Content="address modbus start from 1"/>
                 </ComboBox>
                 
                 <TextBlock Text="Scan Rate (ms):" VerticalAlignment="Center" Margin="0,0,5,0" Foreground="#6C757D" FontWeight="SemiBold" FontSize="12"/>
-                <TextBox x:Name="txtScanRate" Text="1000" Width="60" Padding="2" TextAlignment="Center" BorderBrush="#DEE2E6" Style="{StaticResource ModernTextBox}" LostFocus="TxtScanRate_LostFocus" KeyDown="TxtScanRate_KeyDown"/>
+                <TextBox x:Name="txtScanRate" Text="1000" Width="60" Height="30" MinHeight="0" Padding="2" TextAlignment="Center" BorderBrush="#DEE2E6" Style="{StaticResource ModernTextBox}" LostFocus="TxtScanRate_LostFocus" KeyDown="TxtScanRate_KeyDown"/>
             </StackPanel>
 
             <!-- Pagination Footer -->

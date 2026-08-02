@@ -47,7 +47,7 @@
             </StackPanel>
 
             <!-- Data Type -->
-            <StackPanel Grid.Column="3">
+            <StackPanel x:Name="pnlDataType" Grid.Column="3">
                 <TextBlock Text="Data Type" FontWeight="SemiBold" Margin="0,0,0,5"/>
                 <ComboBox x:Name="cmbDataType" Padding="5" SelectionChanged="CmbDataType_SelectionChanged">
                     <ComboBoxItem Content="UInt16 (16-bit)"/>
@@ -58,12 +58,14 @@
                     <ComboBoxItem Content="Int64 (64-bit)"/>
                     <ComboBoxItem Content="UInt64 (64-bit)"/>
                     <ComboBoxItem Content="Double (64-bit)"/>
+                    <ComboBoxItem Content="String (1 char/word)"/>
+                    <ComboBoxItem Content="String (2 chars/word)"/>
                 </ComboBox>
             </StackPanel>
         </Grid>
 
         <!-- Row 2: Byte Order, Length -->
-        <Grid Grid.Row="1" Margin="0,0,0,15">
+        <Grid x:Name="gridOptions" Grid.Row="1" Margin="0,0,0,15">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*"/>
                 <ColumnDefinition Width="*"/>
@@ -82,7 +84,7 @@
 
             <!-- Length -->
             <StackPanel Grid.Column="1">
-                <TextBlock Text="Length (Words)" FontWeight="SemiBold" Margin="0,0,0,5"/>
+                <TextBlock x:Name="lblLength" Text="Length (Words)" FontWeight="SemiBold" Margin="0,0,0,5"/>
                 <TextBox x:Name="txtLength" Text="1" Padding="5" Background="#E9ECEF" IsReadOnly="True"/>
             </StackPanel>
         </Grid>
@@ -90,7 +92,7 @@
         <!-- Row 3: Bulk Add Count -->
         <StackPanel Grid.Row="2" Margin="0,0,0,15">
             <TextBlock Text="Bulk Add Count (Berapa banyak register berurutan yang ingin ditambahkan?)" FontWeight="SemiBold" Margin="0,0,0,5"/>
-            <TextBox x:Name="txtBulkAddCount" Text="10" Padding="5"/>
+            <TextBox x:Name="txtBulkAddCount" Text="1" Padding="5"/>
         </StackPanel>
         
         <Separator Grid.Row="3" Margin="0,5,0,15" Background="#DEE2E6"/>
