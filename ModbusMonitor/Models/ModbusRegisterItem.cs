@@ -6,7 +6,7 @@ namespace ModbusMonitor.Models
     public class ModbusRegisterItem : INotifyPropertyChanged
     {
         private string _type = string.Empty;
-        private string _name = "Label";
+        private string _name = string.Empty;
         private byte _slaveId = 1;
         private int _address;
         private string _dataType = "UInt16 (16-bit)";

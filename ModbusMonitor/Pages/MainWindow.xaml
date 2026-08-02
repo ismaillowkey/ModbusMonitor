@@ -97,6 +97,9 @@
     <DockPanel>
         <Menu DockPanel.Dock="Top" Background="#E9ECEF" Padding="5,2" BorderBrush="#DEE2E6" BorderThickness="0,0,0,1">
             <MenuItem Header="_File">
+                <MenuItem Header="Import Config..." Click="MenuImport_Click"/>
+                <MenuItem Header="Export Config..." Click="MenuExport_Click"/>
+                <Separator/>
                 <MenuItem Header="E_xit" Click="MenuExit_Click"/>
             </MenuItem>
             <MenuItem Header="_Help">

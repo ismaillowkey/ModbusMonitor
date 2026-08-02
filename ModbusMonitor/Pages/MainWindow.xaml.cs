@@ -14,6 +14,10 @@ using NModbus.IO;
 using NModbus.Serial;
 using ModbusMonitor.Models;
 using ModbusMonitor.Utils;
+using System.IO;
+using System.Text.Json;
+using System.Collections.Generic;
+using Microsoft.Win32;
 
 namespace ModbusMonitor
 {
@@ -679,7 +683,85 @@ namespace ModbusMonitor
 
         private void MenuAbout_Click(object sender, RoutedEventArgs e)
         {
-            MessageBox.Show("Modbus Monitor v0.5.0\n\nA modern WPF Modbus TCP and Serial Client developed by Ismail Lowkey.\n\nThis application allows monitoring and writing to Modbus devices using TCP, RTU over TCP, and Serial (RTU/ASCII) protocols.", "About Modbus Monitor", MessageBoxButton.OK, MessageBoxImage.Information);
+            MessageBox.Show("Modbus Monitor v0.8.0\n\nA modern WPF Modbus TCP and Serial Client developed by Ismail Lowkey.\n\nThis application allows monitoring and writing to Modbus devices using TCP, RTU over TCP, and Serial (RTU/ASCII) protocols.", "About Modbus Monitor", MessageBoxButton.OK, MessageBoxImage.Information);
+        }
+
+        private void MenuExport_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                var saveFileDialog = new SaveFileDialog
+                {
+                    Filter = "Modbus Monitor Config (*.MMIL)|*.MMIL|All files (*.*)|*.*",
+                    Title = "Export Configuration",
+                    DefaultExt = ".MMIL"
+                };
+
+                if (saveFileDialog.ShowDialog() == true)
+                {
+                    var config = new WorkspaceConfig();
+                    
+                    config.Coils = _allCoils.Select(x => new RegisterItemDto { Name = x.Name, SlaveId = x.SlaveId, Address = x.Address, DataType = x.DataType, Endian = x.Endian, Length = x.Length }).ToList();
+                    config.DiscreteInputs = _allDiscreteInputs.Select(x => new RegisterItemDto { Name = x.Name, SlaveId = x.SlaveId, Address = x.Address, DataType = x.DataType, Endian = x.Endian, Length = x.Length }).ToList();
+                    config.InputRegisters = _allInputRegisters.Select(x => new RegisterItemDto { Name = x.Name, SlaveId = x.SlaveId, Address = x.Address, DataType = x.DataType, Endian = x.Endian, Length = x.Length }).ToList();
+                    config.HoldingRegisters = _allHoldingRegisters.Select(x => new RegisterItemDto { Name = x.Name, SlaveId = x.SlaveId, Address = x.Address, DataType = x.DataType, Endian = x.Endian, Length = x.Length }).ToList();
+
+                    var options = new JsonSerializerOptions { WriteIndented = true };
+                    string jsonString = JsonSerializer.Serialize(config, options);
+                    File.WriteAllText(saveFileDialog.FileName, jsonString);
+                    
+                    MessageBox.Show("Configuration exported successfully!", "Success", MessageBoxButton.OK, MessageBoxImage.Information);
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Failed to export configuration: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+        }
+
+        private void MenuImport_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                var openFileDialog = new OpenFileDialog
+                {
+                    Filter = "Modbus Monitor Config (*.MMIL)|*.MMIL|All files (*.*)|*.*",
+                    Title = "Import Configuration"
+                };
+
+                if (openFileDialog.ShowDialog() == true)
+                {
+                    string jsonString = File.ReadAllText(openFileDialog.FileName);
+                    var config = JsonSerializer.Deserialize<WorkspaceConfig>(jsonString);
+
+                    if (config != null)
+                    {
+                        _allCoils.Clear();
+                        _allDiscreteInputs.Clear();
+                        _allInputRegisters.Clear();
+                        _allHoldingRegisters.Clear();
+
+                        foreach (var item in config.Coils)
+                            _allCoils.Add(new ModbusRegisterItem { Type = "Coil", Name = item.Name, SlaveId = item.SlaveId, Address = item.Address, DataType = item.DataType, Endian = item.Endian, Length = item.Length });
+                            
+                        foreach (var item in config.DiscreteInputs)
+                            _allDiscreteInputs.Add(new ModbusRegisterItem { Type = "Discrete Input", Name = item.Name, SlaveId = item.SlaveId, Address = item.Address, DataType = item.DataType, Endian = item.Endian, Length = item.Length });
+                            
+                        foreach (var item in config.InputRegisters)
+                            _allInputRegisters.Add(new ModbusRegisterItem { Type = "Input Register", Name = item.Name, SlaveId = item.SlaveId, Address = item.Address, DataType = item.DataType, Endian = item.Endian, Length = item.Length });
+                            
+                        foreach (var item in config.HoldingRegisters)
+                            _allHoldingRegisters.Add(new ModbusRegisterItem { Type = "Holding Register", Name = item.Name, SlaveId = item.SlaveId, Address = item.Address, DataType = item.DataType, Endian = item.Endian, Length = item.Length });
+
+                        UpdatePagination();
+                        MessageBox.Show("Configuration imported successfully!", "Success", MessageBoxButton.OK, MessageBoxImage.Information);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Failed to import configuration: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
         }
     }
 }
