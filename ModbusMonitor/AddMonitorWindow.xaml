@@ -1,0 +1,116 @@
+<Window x:Class="ModbusMonitor.AddMonitorWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Add Monitor Address" Height="340" Width="650"
+        WindowStartupLocation="CenterOwner" ResizeMode="NoResize"
+        Background="#F8F9FA">
+    <Grid Margin="20">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <!-- Row 1: Register Type, Slave ID, Address, Data Type -->
+        <Grid Grid.Row="0" Margin="0,0,0,15">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="2*"/>
+                <ColumnDefinition Width="1*"/>
+                <ColumnDefinition Width="2*"/>
+                <ColumnDefinition Width="2*"/>
+            </Grid.ColumnDefinitions>
+
+            <!-- Register Type -->
+            <StackPanel Grid.Column="0" Margin="0,0,10,0">
+                <TextBlock Text="Register Type" FontWeight="SemiBold" Margin="0,0,0,5"/>
+                <ComboBox x:Name="cmbRegisterType" Padding="5" SelectionChanged="CmbRegisterType_SelectionChanged">
+                    <ComboBoxItem Content="HOLDING REGISTER (4x)"/>
+                    <ComboBoxItem Content="INPUT REGISTER (3x)"/>
+                    <ComboBoxItem Content="DISCRETE INPUT (1x)"/>
+                    <ComboBoxItem Content="COIL (0x)"/>
+                </ComboBox>
+            </StackPanel>
+
+            <!-- Slave ID -->
+            <StackPanel Grid.Column="1" Margin="0,0,10,0">
+                <TextBlock Text="Slave ID" FontWeight="SemiBold" Margin="0,0,0,5"/>
+                <TextBox x:Name="txtSlaveId" Text="1" Padding="5"/>
+            </StackPanel>
+
+            <!-- Address -->
+            <StackPanel Grid.Column="2" Margin="0,0,10,0">
+                <TextBlock x:Name="lblAddress" Text="Address" FontWeight="SemiBold" Margin="0,0,0,5"/>
+                <TextBox x:Name="txtAddress" Text="0" Padding="5"/>
+            </StackPanel>
+
+            <!-- Data Type -->
+            <StackPanel Grid.Column="3">
+                <TextBlock Text="Data Type" FontWeight="SemiBold" Margin="0,0,0,5"/>
+                <ComboBox x:Name="cmbDataType" Padding="5" SelectionChanged="CmbDataType_SelectionChanged">
+                    <ComboBoxItem Content="UInt16 (16-bit)"/>
+                    <ComboBoxItem Content="Int16 (16-bit)"/>
+                    <ComboBoxItem Content="UInt32 (32-bit)"/>
+                    <ComboBoxItem Content="Int32 (32-bit)"/>
+                    <ComboBoxItem Content="Float (32-bit)"/>
+                    <ComboBoxItem Content="Int64 (64-bit)"/>
+                    <ComboBoxItem Content="UInt64 (64-bit)"/>
+                    <ComboBoxItem Content="Double (64-bit)"/>
+                </ComboBox>
+            </StackPanel>
+        </Grid>
+
+        <!-- Row 2: Byte Order, Length -->
+        <Grid Grid.Row="1" Margin="0,0,0,15">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+
+            <!-- Byte Order -->
+            <StackPanel Grid.Column="0" Margin="0,0,10,0">
+                <TextBlock Text="Byte Order (Endianness)" FontWeight="SemiBold" Margin="0,0,0,5"/>
+                <ComboBox x:Name="cmbEndianness" Padding="5">
+                    <ComboBoxItem Content="ABCD (Big Endian)"/>
+                    <ComboBoxItem Content="DCBA (Little Endian)"/>
+                    <ComboBoxItem Content="BADC (Byte Swap)"/>
+                    <ComboBoxItem Content="CDAB (Word Swap)"/>
+                </ComboBox>
+            </StackPanel>
+
+            <!-- Length -->
+            <StackPanel Grid.Column="1">
+                <TextBlock Text="Length (Words)" FontWeight="SemiBold" Margin="0,0,0,5"/>
+                <TextBox x:Name="txtLength" Text="1" Padding="5" Background="#E9ECEF" IsReadOnly="True"/>
+            </StackPanel>
+        </Grid>
+
+        <!-- Row 3: Bulk Add Count -->
+        <StackPanel Grid.Row="2" Margin="0,0,0,15">
+            <TextBlock Text="Bulk Add Count (Berapa banyak register berurutan yang ingin ditambahkan?)" FontWeight="SemiBold" Margin="0,0,0,5"/>
+            <TextBox x:Name="txtBulkAddCount" Text="10" Padding="5"/>
+        </StackPanel>
+        
+        <Separator Grid.Row="3" Margin="0,5,0,15" Background="#DEE2E6"/>
+
+        <!-- Buttons -->
+        <StackPanel Grid.Row="5" Orientation="Horizontal" HorizontalAlignment="Right">
+            <Button Content="Cancel" Width="90" Height="35" Background="#6C757D" Foreground="White" BorderThickness="0" Margin="0,0,10,0" Click="BtnCancel_Click" Cursor="Hand">
+                <Button.Resources>
+                    <Style TargetType="Border">
+                        <Setter Property="CornerRadius" Value="4"/>
+                    </Style>
+                </Button.Resources>
+            </Button>
+            <Button Content="Submit / Add" Width="120" Height="35" Background="#0D6EFD" Foreground="White" BorderThickness="0" Click="BtnSave_Click" Cursor="Hand">
+                <Button.Resources>
+                    <Style TargetType="Border">
+                        <Setter Property="CornerRadius" Value="4"/>
+                    </Style>
+                </Button.Resources>
+            </Button>
+        </StackPanel>
+    </Grid>
+</Window>
