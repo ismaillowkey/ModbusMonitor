@@ -1,5 +1,7 @@
 # Modbus Monitor
 
+📥 **[Download Latest Version (Installer)](https://github.com/ismaillowkey/ModbusMonitor/releases)**
+
 A modern, WPF-based Modbus TCP and Serial Client for monitoring and writing to Modbus devices.
 
 ## Features
