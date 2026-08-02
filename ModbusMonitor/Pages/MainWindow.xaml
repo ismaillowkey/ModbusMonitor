@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:ModbusMonitor"
         mc:Ignorable="d"
-        Icon="img/logo.png"
+        Icon="/img/logo.png"
         Title="Modbus Monitor" SizeToContent="Height" Width="1250" Background="#F8F9FA">
     <Window.Resources>
         <!-- Modern Button Style -->

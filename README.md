@@ -18,17 +18,31 @@ A modern, WPF-based Modbus TCP and Serial Client for monitoring and writing to M
    ```
 
 ## How to Build the Installer
-This project uses NSIS (Nullsoft Scriptable Install System) to generate a professional setup executable.
+This project uses NSIS (Nullsoft Scriptable Install System) to generate a professional setup executable for both **x86** and **x64** architectures.
 
-1. **Publish the application:**
-   Open a terminal in the `ModbusMonitor` directory and run:
-   ```bash
-   dotnet publish -c Release -o publish
-   ```
-2. **Compile the Installer:**
-   - Install NSIS from [https://nsis.sourceforge.io/Download](https://nsis.sourceforge.io/Download).
-   - Right-click `installer.nsi` in the `ModbusMonitor` directory and select **"Compile NSIS Script"**.
-   - The setup file `setup_modbusMonitor.exe` will be generated in the same directory.
+### Prerequisites
+- [.NET 10.0 SDK](https://dotnet.microsoft.com/download)
+- [NSIS](https://nsis.sourceforge.io/Download) — Install NSIS terlebih dahulu sebelum menjalankan skrip build.
+
+### Build & Package (Otomatis)
+Jalankan satu skrip untuk publish + compile installer sekaligus:
+```bat
+cd ModbusMonitor
+build_release.bat
+```
+
+Skrip ini akan:
+1. `dotnet publish` untuk **win-x86** → `bin\Release\net10.0-windows\win-x86`
+2. `dotnet publish` untuk **win-x64** → `bin\Release\net10.0-windows\win-x64`
+3. Compile installer NSIS untuk **x86** → `setup_Modbus Monitor_v0.6.0_x86.exe`
+4. Compile installer NSIS untuk **x64** → `setup_Modbus Monitor_v0.6.0_x64.exe`
+
+### Manual (Opsional)
+Jika ingin compile installer secara manual:
+```bat
+"C:\Program Files (x86)\NSIS\makensis.exe" /DARCH=x86 installer.nsi
+"C:\Program Files (x86)\NSIS\makensis.exe" /DARCH=x64 installer.nsi
+```
 
 ## Publisher
 Developed by **Ismail Lowkey**

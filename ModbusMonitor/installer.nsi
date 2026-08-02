@@ -1,14 +1,29 @@
 !define APPNAME "Modbus Monitor"
-!define APPVERSION "0.5.0"
+!define APPVERSION "0.6.1"
 !define COMPANYNAME "Ismail Lowkey"
 !define DESCRIPTION "A Modern WPF Modbus TCP Client"
 
+!macro ChooseTarget ARCH
+  !if "${ARCH}" == "x86"
+    OutFile "setup_${APPNAME}_v${APPVERSION}_x86.exe"
+    InstallDir "$PROGRAMFILES\${COMPANYNAME}\${APPNAME}"
+  !else
+    OutFile "setup_${APPNAME}_v${APPVERSION}_x64.exe"
+    InstallDir "$PROGRAMFILES64\${COMPANYNAME}\${APPNAME}"
+  !endif
+!macroend
+
 ; The name of the installer
 Name "${APPNAME} ${APPVERSION}"
-OutFile "setup_modbusMonitor.exe"
+
+; Set target based on /DARCH=x86 or /DARCH=x64
+!ifndef ARCH
+  !define ARCH "x64"   ; default x64 kalau tidak di-pass
+!endif
+!insertmacro ChooseTarget "${ARCH}"
 
 ; Default installation directory (64-bit Program Files)
-InstallDir "$PROGRAMFILES64\${COMPANYNAME}\${APPNAME}"
+; InstallDir is set by the macro ChooseTarget
 
 ; Request application privileges for Windows (Require admin rights)
 RequestExecutionLevel admin
@@ -57,9 +72,12 @@ Section "Install"
   
   ; Set output path to the installation directory
   SetOutPath "$INSTDIR"
-  
-  ; Put all files from the publish folder into the installation directory
-  File /r "publish\*.*"
+    ; Put all files from the correct publish folder into the installation directory
+    !if "${ARCH}" == "x86"
+      File /r "bin\Release\net10.0-windows\win-x86\*.*"
+    !else
+      File /r "bin\Release\net10.0-windows\win-x64\*.*"
+    !endif
   
   ; Create the uninstaller
   WriteUninstaller "$INSTDIR\uninstall.exe"

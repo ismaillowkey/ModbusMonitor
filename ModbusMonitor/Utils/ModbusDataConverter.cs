@@ -1,7 +1,7 @@
 using System;
 using System.Linq;
 
-namespace ModbusMonitor
+namespace ModbusMonitor.Utils
 {
     public static class ModbusDataConverter
     {

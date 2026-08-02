@@ -13,6 +13,7 @@ using NModbus;
 using NModbus.IO;
 using NModbus.Serial;
 using ModbusMonitor.Models;
+using ModbusMonitor.Utils;
 
 namespace ModbusMonitor
 {
